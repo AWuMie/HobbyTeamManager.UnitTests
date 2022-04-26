@@ -4,6 +4,12 @@ using System.Threading.Tasks;
 using HobbyTeamManager.Data;
 using HobbyTeamManager.Pages.Sites;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Moq;
 
 namespace HobbyTeamManager.UnitTests.UnitTests;
 
@@ -43,13 +49,29 @@ public class SiteHomeModelTests
     }
 
     [Test]
-    public async Task OnGetAsync_SiteFoundWithId_ReturnsPage()
+    public async Task OnGetAsync_SiteFoundInDbWithId_ReturnsPage()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Utilities.Utilities.TestDbContextOptions());
 
-        SeedSite(context);
-        var page = new HomeModel(context);
+        var httpContext = new DefaultHttpContext
+        {
+            Session = new DummySession()
+        };
+        var modelState = new ModelStateDictionary();
+        var actionContext = new ActionContext(httpContext,new RouteData(), new PageActionDescriptor(), modelState);
+        var modelMetadataProvider = new EmptyModelMetadataProvider();
+        var viewData = new ViewDataDictionary(modelMetadataProvider, modelState);
+        var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
+        var pageContext = new PageContext(actionContext) { ViewData = viewData };
+        var page = new HomeModel(context)
+        {
+            PageContext = pageContext,
+            TempData = tempData,
+            Url = new UrlHelper(actionContext)
+        };
+
+        SeedSiteInDb(context);
         var expectedResult = new PageResult();
 
         // act
@@ -59,7 +81,7 @@ public class SiteHomeModelTests
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
     }
 
-    private void SeedSite(HobbyTeamManagerContext context)
+    private void SeedSiteInDb(HobbyTeamManagerContext context)
     {
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
         _ = context.Sites.Add(new Models.Site());

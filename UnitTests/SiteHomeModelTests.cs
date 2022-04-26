@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Moq;
+using HobbyTeamManager.UnitTests.Utilities;
 
 namespace HobbyTeamManager.UnitTests.UnitTests;
 
@@ -20,8 +21,7 @@ public class SiteHomeModelTests
     public async Task OnGetAsync_ParameterIdEqualsNull_ReturnsNotFound()
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(Utilities.Utilities.TestDbContextOptions());
-
+        using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
         var page = new HomeModel(context);
         var expectedResult = new NotFoundResult();
 
@@ -36,8 +36,7 @@ public class SiteHomeModelTests
     public async Task OnGetAsync_NoSiteWithId_ReturnsNotFound()
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(Utilities.Utilities.TestDbContextOptions());
-
+        using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
         var page = new HomeModel(context);
         var expectedResult = new NotFoundResult();
 
@@ -52,30 +51,15 @@ public class SiteHomeModelTests
     public async Task OnGetAsync_SiteFoundInDbWithId_ReturnsPage()
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(Utilities.Utilities.TestDbContextOptions());
-
-        var httpContext = new DefaultHttpContext
-        {
-            Session = new DummySession()
-        };
-        var modelState = new ModelStateDictionary();
-        var actionContext = new ActionContext(httpContext,new RouteData(), new PageActionDescriptor(), modelState);
-        var modelMetadataProvider = new EmptyModelMetadataProvider();
-        var viewData = new ViewDataDictionary(modelMetadataProvider, modelState);
-        var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
-        var pageContext = new PageContext(actionContext) { ViewData = viewData };
-        var page = new HomeModel(context)
-        {
-            PageContext = pageContext,
-            TempData = tempData,
-            Url = new UrlHelper(actionContext)
-        };
-
+        using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
+        var page = Helpers.PageFromDummyHttpContext<HomeModel>(context);
         SeedSiteInDb(context);
         var expectedResult = new PageResult();
 
         // act
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
         var actualResult = await page.OnGetAsync(1);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
         // assert
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
@@ -84,7 +68,7 @@ public class SiteHomeModelTests
     private void SeedSiteInDb(HobbyTeamManagerContext context)
     {
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-        _ = context.Sites.Add(new Models.Site());
+        context.Sites.Add(new Models.Site());
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         context.SaveChanges();
     }

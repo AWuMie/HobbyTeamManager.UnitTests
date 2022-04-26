@@ -1,16 +1,10 @@
 ﻿using HobbyTeamManager.Data;
-using HobbyTeamManager.Pages;
 using HobbyTeamManager.Pages.Sites;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Routing;
-using Moq;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using HobbyTeamManager.UnitTests.Utilities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HobbyTeamManager.UnitTests.UnitTests;
 
@@ -21,8 +15,7 @@ internal class SiteCreateModelTests
     public void OnGet_WhenCalled_InitializesDropdownLists()
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(Utilities.Utilities.TestDbContextOptions());
-
+        using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
         var page = new CreateModel(context);
         var expectedResult = new PageResult();
 
@@ -35,29 +28,16 @@ internal class SiteCreateModelTests
         Assert.That(page.MenuPositionOptions, Is.Not.Null);
     }
 
+    [Test]
     public async Task OnPostAsync_ModelStateInvalid_ReturnsToPage()
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(Utilities.Utilities.TestDbContextOptions());
-
-        var httpContext = new DefaultHttpContext();
-        httpContext.Session = new DummySession();
-        var modelState = new ModelStateDictionary();
-        var actionContext = new ActionContext(httpContext, new RouteData(), new PageActionDescriptor(), modelState);
-        var modelMetadataProvider = new EmptyModelMetadataProvider();
-        var viewData = new ViewDataDictionary(modelMetadataProvider, modelState);
-        var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
-        var pageContext = new PageContext(actionContext) { ViewData = viewData };
-        
-        var page = new CreateModel(context)
-        {
-            PageContext = pageContext,
-            TempData = tempData,
-            Url = new UrlHelper(actionContext)
-        };
-        page.ModelState.AddModelError("Message.Text", "Some error text.");
-
-        // SeedSiteInDb(context);
+        using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
+        var page = Helpers.PageFromDummyHttpContext<CreateModel>(context);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+        page.Site = new Models.Site();
+        page.ModelState.AddModelError("Error.Text", "Some error text.");
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
         var expectedResult = new PageResult();
 
         // act
@@ -65,26 +45,26 @@ internal class SiteCreateModelTests
 
         // assert
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
+        Assert.That(page.ConfirmationModeOptions, Is.Not.Null);
+        Assert.That(page.MenuPositionOptions, Is.Not.Null);
     }
 
-    public T PageFromDummyContext<T>(HobbyTeamManagerContext context)
-        where T : BasePageModel
+    [Test]
+    public async Task OnPostAsync_ModelStateValid_ReturnsToIndexPage()
     {
-        var httpContext = new DefaultHttpContext();
-        httpContext.Session = new DummySession();
-        var modelState = new ModelStateDictionary();
-        var actionContext = new ActionContext(httpContext, new RouteData(), new PageActionDescriptor(), modelState);
-        var modelMetadataProvider = new EmptyModelMetadataProvider();
-        var viewData = new ViewDataDictionary(modelMetadataProvider, modelState);
-        var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
-        var pageContext = new PageContext(actionContext) { ViewData = viewData };
+        // arrange
+        using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
+        var page = Helpers.PageFromDummyHttpContext<CreateModel>(context);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+        page.Site = new Models.Site();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        var expectedResult = new RedirectToPageResult("./Index");
 
-        var page = new BasePageModel(context)
-        {
-            PageContext = pageContext,
-            TempData = tempData,
-            Url = new UrlHelper(actionContext)
-        };
-        return (T)page;
+        // act
+        var actualResult = await page.OnPostAsync();
+
+        // assert
+        Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
+        Assert.That(page.Site.Id, Is.EqualTo(1));
     }
 }

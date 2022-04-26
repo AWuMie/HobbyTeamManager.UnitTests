@@ -4,6 +4,7 @@ using HobbyTeamManager.Pages.Sites;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using HobbyTeamManager.UnitTests.Utilities;
 
 namespace HobbyTeamManager.UnitTests.UnitTests;
 
@@ -17,10 +18,7 @@ public class SiteIndexModelTests
     public async Task OnGetAsync_WhenCalled_SiteListFilled(int numSites)
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(
-            HobbyTeamManager.UnitTests.Utilities.Utilities.TestDbContextOptions());
-
-        //SeedSite(context);
+        using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         SeedNumSites(context, numSites);
         var page = new IndexModel(context);
 
@@ -48,21 +46,6 @@ public class SiteIndexModelTests
         }
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
         context.Sites.AddRange(sites);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-        context.SaveChanges();
-    }
-
-    private void SeedSite(HobbyTeamManagerContext context)
-    {
-        var site = new Site()
-        {
-            Name = "Name",
-            Headline = "Headline",
-            ConfirmationModeId = 1,
-            MenuPositionId = 1,
-        };
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-        context.Sites.Add(site);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         context.SaveChanges();
     }

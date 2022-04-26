@@ -14,8 +14,7 @@ public class SiteDetailsModelTests
     public async Task OnGetAsync_ParameterIdEqualsNull_ReturnsNotFound()
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(Utilities.Utilities.TestDbContextOptions());
-
+        using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
         var page = new DetailsModel(context);
         var expectedResult = new NotFoundResult();
 
@@ -30,8 +29,7 @@ public class SiteDetailsModelTests
     public async Task OnGetAsync_NoSiteWithId_ReturnsNotFound()
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(Utilities.Utilities.TestDbContextOptions());
-
+        using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
         var page = new DetailsModel(context);
         var expectedResult = new NotFoundResult();
 
@@ -46,8 +44,7 @@ public class SiteDetailsModelTests
     public async Task OnGetAsync_SiteFoundWithId_ReturnsPage()
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(Utilities.Utilities.TestDbContextOptions());
-
+        using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
         SeedSite(context);
         var page = new DetailsModel(context);
         var expectedResult = new PageResult();

@@ -19,7 +19,7 @@ public class SiteIndexModelTests
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
-        SeedNumSites(context, numSites);
+        Helpers.SeedNumSites(context, numSites);
         var page = new IndexModel(context);
 
         // act
@@ -27,26 +27,5 @@ public class SiteIndexModelTests
 
         // assert
         Assert.That(page.Site.Count, Is.EqualTo(numSites));
-    }
-
-    private void SeedNumSites(HobbyTeamManagerContext context, int num)
-    {
-        var sites = new List<Site>();
-
-        for (int i = 0; i < num; i++)
-        {
-            var site = new Site()
-            {
-                Name = "Name" + (i + 1).ToString(),
-                Headline = "Headline" + (i + 1).ToString(),
-                ConfirmationModeId = 1,
-                MenuPositionId = 1,
-            };
-            sites.Add(site);
-        }
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-        context.Sites.AddRange(sites);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-        context.SaveChanges();
     }
 }

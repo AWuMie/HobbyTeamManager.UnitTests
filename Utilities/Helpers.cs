@@ -15,6 +15,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using Microsoft.Extensions.Primitives;
+using HobbyTeamManager.Models;
 
 namespace HobbyTeamManager.UnitTests.Utilities;
 
@@ -72,5 +73,34 @@ public static class Helpers
         page.Url = new UrlHelper(actionContext);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         return page;
+    }
+
+    public static void SeedSite(HobbyTeamManagerContext context)
+    {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+        _ = context.Sites.Add(new Models.Site());
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        context.SaveChanges();
+    }
+
+    public static void SeedNumSites(HobbyTeamManagerContext context, int num)
+    {
+        var sites = new List<Site>();
+
+        for (int i = 0; i < num; i++)
+        {
+            var site = new Site()
+            {
+                Name = "Name" + (i + 1).ToString(),
+                Headline = "Headline" + (i + 1).ToString(),
+                ConfirmationModeId = 1,
+                MenuPositionId = 1,
+            };
+            sites.Add(site);
+        }
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+        context.Sites.AddRange(sites);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        context.SaveChanges();
     }
 }

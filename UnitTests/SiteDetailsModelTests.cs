@@ -1,5 +1,6 @@
 ﻿using HobbyTeamManager.Data;
 using HobbyTeamManager.Pages.Sites;
+using HobbyTeamManager.UnitTests.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NUnit.Framework;
@@ -45,7 +46,7 @@ public class SiteDetailsModelTests
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
-        SeedSite(context);
+        Helpers.SeedSite(context);
         var page = new DetailsModel(context);
         var expectedResult = new PageResult();
         int id = 1;
@@ -56,13 +57,5 @@ public class SiteDetailsModelTests
         // assert
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
         Assert.That(page.Site.Id, Is.EqualTo(id));
-    }
-
-    private void SeedSite(HobbyTeamManagerContext context)
-    {
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-        _ = context.Sites.Add(new Models.Site());
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-        context.SaveChanges();
     }
 }

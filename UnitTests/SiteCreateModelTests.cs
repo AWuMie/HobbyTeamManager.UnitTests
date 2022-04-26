@@ -12,7 +12,7 @@ namespace HobbyTeamManager.UnitTests.UnitTests;
 internal class SiteCreateModelTests
 {
     [Test]
-    public void OnGet_WhenCalled_InitializesDropdownLists()
+    public void OnGet_WhenCalled_InitializesDropdownListsAndReturnsPage()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
@@ -29,7 +29,7 @@ internal class SiteCreateModelTests
     }
 
     [Test]
-    public async Task OnPostAsync_ModelStateInvalid_ReturnsToPage()
+    public async Task OnPostAsync_ModelStateInvalid_ReturnsPage()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());

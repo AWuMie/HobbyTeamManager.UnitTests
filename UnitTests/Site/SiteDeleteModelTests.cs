@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 namespace HobbyTeamManager.UnitTests.UnitTests;
 
 [TestFixture]
-public class SiteEditModelTests
+public class SiteDeleteModelTests
 {
     [Test]
     public async Task OnGetAsync_IdNull_ReturnNotFound()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
-        var page = new EditModel(context);
+        var page = new DeleteModel(context);
         var expectedResult = new NotFoundResult();
 
         // act
@@ -33,7 +33,7 @@ public class SiteEditModelTests
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
-        var page = new EditModel(context);
+        var page = new DeleteModel(context);
         var expectedResult = new NotFoundResult();
 
         // act
@@ -48,7 +48,7 @@ public class SiteEditModelTests
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
-        var page = new EditModel(context);
+        var page = new DeleteModel(context);
         Helpers.SeedSite(context);
         var expectedResult = new NotFoundResult();
 
@@ -64,7 +64,7 @@ public class SiteEditModelTests
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
-        var page = new EditModel(context);
+        var page = new DeleteModel(context);
         Helpers.SeedNumSites(context, 3);
         var expectedResult = new PageResult();
 
@@ -76,45 +76,71 @@ public class SiteEditModelTests
     }
 
     [Test]
-    public async Task OnPostAsync_ModelStateInvalid_ReturnsPage()
+    public async Task OnPostAsync_IdNull_ReturnNotFound()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
-        var page = Helpers.PageFromDummyHttpContext<EditModel>(context);
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-        page.Site = new Models.Site();
-        page.ModelState.AddModelError("Error.Text", "Some error text.");
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-        var expectedResult = new PageResult();
+        var page = new DeleteModel(context);
+        var expectedResult = new NotFoundResult();
 
         // act
-        var actualResult = await page.OnPostAsync();
+        var actualResult = await page.OnPostAsync(null);
 
         // assert
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
-        Assert.That(page.ConfirmationModeOptions, Is.Not.Null);
-        Assert.That(page.MenuPositionOptions, Is.Not.Null);
     }
 
     [Test]
-    public async Task OnPostAsync_ModelStateValid_ReturnsToIndexPage()
+    public async Task OnPostAsync_SiteNotFound_NoSiteDeletedReDirecttoIndexPage()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
-        var page = Helpers.PageFromDummyHttpContext<EditModel>(context);
-        Helpers.SeedNumSites(context, 1);
-#pragma warning disable CS8604 // Possible null reference argument.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-        page.Site = context.Sites.First();
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-#pragma warning restore CS8604 // Possible null reference argument.
+        var page = new DeleteModel(context);
+        int numSites = 3;
+        Helpers.SeedNumSites(context, numSites);
         var expectedResult = new RedirectToPageResult("./Index");
+        int id = 5;
+#pragma warning disable CS8604 // Possible null reference argument.
+        var expectedSites = context.Sites.Where(s => s.Id != id).ToList();
+#pragma warning restore CS8604 // Possible null reference argument.
 
         // act
-        var actualResult = await page.OnPostAsync();
+        var actualResult = await page.OnPostAsync(id);
 
         // assert
+        var actualSites = context.Sites.AsNoTracking().ToList();
+
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
-        Assert.That(page.Site.Id, Is.EqualTo(1));
+        Assert.That(actualSites.Count, Is.EqualTo(numSites));
+        Assert.That(actualSites.Count, Is.EqualTo(expectedSites.Count));
+        Assert.That(actualSites.OrderBy(s => s.Id).Select(s => s.Name),
+            Is.EqualTo(expectedSites.OrderBy(s => s.Id).Select(s => s.Name)));
+    }
+
+    [Test]
+    public async Task OnPostAsync_SiteFound_ReDirectToIndexPage()
+    {
+        // arrange
+        using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
+        var page = new DeleteModel(context);
+        int numSites = 3;
+        Helpers.SeedNumSites(context, numSites);
+        var expectedResult = new RedirectToPageResult("./Index");
+        int id = 2;
+#pragma warning disable CS8604 // Possible null reference argument.
+        var expectedSites = context.Sites.Where(s => s.Id != id).ToList();
+#pragma warning restore CS8604 // Possible null reference argument.
+
+        // act
+        var actualResult = await page.OnPostAsync(id);
+
+        // assert
+        var actualSites = context.Sites.AsNoTracking().ToList();
+
+        Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
+        Assert.That(actualSites.Count, Is.EqualTo(numSites - 1));
+        Assert.That(actualSites.Count, Is.EqualTo(expectedSites.Count));
+        Assert.That(actualSites.OrderBy(s => s.Id).Select(s => s.Name),
+            Is.EqualTo(expectedSites.OrderBy(s => s.Id).Select(s => s.Name)));
     }
 }

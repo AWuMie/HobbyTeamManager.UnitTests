@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Moq;
 using Microsoft.AspNetCore.Mvc.Routing;
 using System;
-using System.IO;
 using System.Collections.Generic;
 using Microsoft.Extensions.Primitives;
 using HobbyTeamManager.Models;
@@ -45,11 +44,6 @@ public static class Helpers
     public static T? PageFromDummyHttpContext<T>(HobbyTeamManagerContext context)
         where T : BasePageModel
     {
-        //var httpRequest = new HttpRequest("", "http://example.com/", "");
-        //var stringWriter = new StringWriter();
-        //var httpResponse = new HttpResponse(stringWriter);
-        //var httpContext = new HttpContext(httpRequest, httpResponse);
-
         var httpContext = new DefaultHttpContext()
         {
             Session = new DummySession(),
@@ -78,7 +72,7 @@ public static class Helpers
     public static void SeedSite(HobbyTeamManagerContext context)
     {
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-        _ = context.Sites.Add(new Models.Site());
+        context.Sites.Add(new Site());
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         context.SaveChanges();
     }
@@ -100,6 +94,42 @@ public static class Helpers
         }
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
         context.Sites.AddRange(sites);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        context.SaveChanges();
+    }
+
+    public static void SeedSeason(HobbyTeamManagerContext context)
+    {
+        var season = new Season()
+        {
+            Year = 2020,
+            StartMonth = 8,
+            MatchOnDay = 0,
+            SiteId = 1,
+        };
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            context.Seasons.Add(season);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        context.SaveChanges();
+    }
+
+    public static void SeedNumSeasons(HobbyTeamManagerContext context, int num)
+    {
+        var seasons = new List<Season>();
+
+        for (int i = 0; i < num; i++)
+        {
+            var season = new Season()
+            {
+                Year = 2020 + (i + 1),
+                StartMonth = 8,
+                MatchOnDay = 0,
+                SiteId = 1,
+            };
+            seasons.Add(season);
+        }
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+        context.Seasons.AddRange(seasons);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         context.SaveChanges();
     }

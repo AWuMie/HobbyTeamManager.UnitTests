@@ -1,8 +1,6 @@
 ﻿using HobbyTeamManager.Data;
-using HobbyTeamManager.Models;
 using HobbyTeamManager.Pages.Sites;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using HobbyTeamManager.UnitTests.Utilities;
 

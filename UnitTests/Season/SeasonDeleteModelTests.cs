@@ -1,5 +1,5 @@
 ﻿using HobbyTeamManager.Data;
-using HobbyTeamManager.Pages.Sites;
+using HobbyTeamManager.Pages.Seasons;
 using HobbyTeamManager.UnitTests.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 namespace HobbyTeamManager.UnitTests.UnitTests;
 
 [TestFixture]
-public class SiteDeleteModelTests
+public class SeasonDeleteModelTests
 {
     [Test]
     public async Task OnGetAsync_IdNull_ReturnNotFound()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
-        var page = new EditModel(context);
+        var page = new DeleteModel(context);
         var expectedResult = new NotFoundResult();
 
         // act
@@ -29,7 +29,7 @@ public class SiteDeleteModelTests
     }
 
     [Test]
-    public async Task OnGetAsync_SiteNull_ReturnNotFound()
+    public async Task OnGetAsync_SeasonNull_ReturnNotFound()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
@@ -50,6 +50,7 @@ public class SiteDeleteModelTests
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new DeleteModel(context);
         Helpers.SeedSite(context);
+        Helpers.SeedSeason(context);
         var expectedResult = new NotFoundResult();
 
         // act
@@ -65,7 +66,8 @@ public class SiteDeleteModelTests
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new DeleteModel(context);
-        Helpers.SeedNumSites(context, 3);
+        Helpers.SeedSite(context);
+        Helpers.SeedNumSeasons(context, 3);
         var expectedResult = new PageResult();
 
         // act
@@ -91,56 +93,58 @@ public class SiteDeleteModelTests
     }
 
     [Test]
-    public async Task OnPostAsync_SiteNotFound_NoSiteDeletedReDirecttoIndexPage()
+    public async Task OnPostAsync_SeasonNotFound_NoSeasonDeletedReDirectToIndexPage()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new DeleteModel(context);
-        int numSites = 3;
-        Helpers.SeedNumSites(context, numSites);
+        Helpers.SeedSite(context);
+        int numSeasons = 3;
+        Helpers.SeedNumSeasons(context, numSeasons);
         var expectedResult = new RedirectToPageResult("./Index");
         int id = 5;
 #pragma warning disable CS8604 // Possible null reference argument.
-        var expectedSites = context.Sites.Where(s => s.Id != id).ToList();
+        var expectedSeasons = context.Seasons.Where(s => s.Id != id).ToList(); // should be all ;-)
 #pragma warning restore CS8604 // Possible null reference argument.
 
         // act
         var actualResult = await page.OnPostAsync(id);
 
         // assert
-        var actualSites = context.Sites.AsNoTracking().ToList();
+        var actualSeasons = context.Seasons.AsNoTracking().ToList();
 
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
-        Assert.That(actualSites.Count, Is.EqualTo(numSites));
-        Assert.That(actualSites.Count, Is.EqualTo(expectedSites.Count));
-        Assert.That(actualSites.OrderBy(s => s.Id).Select(s => s.Name),
-            Is.EqualTo(expectedSites.OrderBy(s => s.Id).Select(s => s.Name)));
+        Assert.That(actualSeasons.Count, Is.EqualTo(numSeasons));
+        Assert.That(actualSeasons.Count, Is.EqualTo(expectedSeasons.Count));
+        Assert.That(actualSeasons.OrderBy(s => s.Id).Select(s => s.Year),
+            Is.EqualTo(expectedSeasons.OrderBy(s => s.Id).Select(s => s.Year)));
     }
 
     [Test]
-    public async Task OnPostAsync_SiteFound_ReDirecttoIndexPage()
+    public async Task OnPostAsync_SeasonFound_ReDirectToIndexPage()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new DeleteModel(context);
-        int numSites = 3;
-        Helpers.SeedNumSites(context, numSites);
+        Helpers.SeedSite(context);
+        int numSeasons = 3;
+        Helpers.SeedNumSeasons(context, numSeasons);
         var expectedResult = new RedirectToPageResult("./Index");
         int id = 2;
 #pragma warning disable CS8604 // Possible null reference argument.
-        var expectedSites = context.Sites.Where(s => s.Id != id).ToList();
+        var expectedSeasons = context.Seasons.Where(s => s.Id != id).ToList();  // should one less here
 #pragma warning restore CS8604 // Possible null reference argument.
 
         // act
         var actualResult = await page.OnPostAsync(id);
 
         // assert
-        var actualSites = context.Sites.AsNoTracking().ToList();
+        var actualSeasons = context.Seasons.AsNoTracking().ToList();
 
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
-        Assert.That(actualSites.Count, Is.EqualTo(numSites - 1));
-        Assert.That(actualSites.Count, Is.EqualTo(expectedSites.Count));
-        Assert.That(actualSites.OrderBy(s => s.Id).Select(s => s.Name),
-            Is.EqualTo(expectedSites.OrderBy(s => s.Id).Select(s => s.Name)));
+        Assert.That(actualSeasons.Count, Is.EqualTo(numSeasons - 1));
+        Assert.That(actualSeasons.Count, Is.EqualTo(expectedSeasons.Count));
+        Assert.That(actualSeasons.OrderBy(s => s.Id).Select(s => s.Year),
+            Is.EqualTo(expectedSeasons.OrderBy(s => s.Id).Select(s => s.Year)));
     }
 }

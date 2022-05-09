@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace HobbyTeamManager.UnitTests.UnitTests.Season;
 
 [TestFixture]
-public class SeasonIndexModelTests
+internal class SeasonIndexModelTests
 {
     [Test]
     [TestCase(1)]
@@ -27,7 +27,7 @@ public class SeasonIndexModelTests
         context.Sites.Add(site);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         context.SaveChanges();
-        //Helpers.SeedSite(context);
+
         Helpers.SeedNumSeasons(context, numSeasons);
 
         var selection = from s in context.Seasons select s;

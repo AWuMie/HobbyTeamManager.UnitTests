@@ -1,21 +1,25 @@
 ﻿using HobbyTeamManager.Data;
-using HobbyTeamManager.Pages.Sites;
+using HobbyTeamManager.Pages.Players;
 using HobbyTeamManager.UnitTests.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace HobbyTeamManager.UnitTests.UnitTests;
+namespace HobbyTeamManager.UnitTests.UnitTests.Player;
 
 [TestFixture]
-internal class SiteDetailsModelTests
+internal class PlayerDetailsModelTests
 {
     [Test]
     public async Task OnGetAsync_ParameterIdEqualsNull_ReturnsNotFound()
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
+        using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new DetailsModel(context);
         var expectedResult = new NotFoundResult();
 
@@ -27,10 +31,10 @@ internal class SiteDetailsModelTests
     }
 
     [Test]
-    public async Task OnGetAsync_NoSiteWithId_ReturnsNotFound()
+    public async Task OnGetAsync_NoPlayerWithId_ReturnsNotFound()
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
+        using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new DetailsModel(context);
         var expectedResult = new NotFoundResult();
 
@@ -42,11 +46,12 @@ internal class SiteDetailsModelTests
     }
 
     [Test]
-    public async Task OnGetAsync_SiteFoundWithId_ReturnsPage()
+    public async Task OnGetAsync_PlayerFoundWithId_ReturnsPage()
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
-        Helpers.SeedNumSites(context, 1);
+        using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
+        Helpers.SeedAllMembershipTypes(context);
+        Helpers.SeedNumPlayers(context, 1);
         var page = new DetailsModel(context);
         var expectedResult = new PageResult();
         int id = 1;
@@ -56,6 +61,6 @@ internal class SiteDetailsModelTests
 
         // assert
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
-        Assert.That(page.Site.Id, Is.EqualTo(id));
+        Assert.That(page.Player.Id, Is.EqualTo(id));
     }
 }

@@ -1,5 +1,5 @@
 ﻿using HobbyTeamManager.Data;
-using HobbyTeamManager.Pages.Sites;
+using HobbyTeamManager.Pages.Players;
 using HobbyTeamManager.UnitTests.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -7,10 +7,10 @@ using NUnit.Framework;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HobbyTeamManager.UnitTests.UnitTests;
+namespace HobbyTeamManager.UnitTests.UnitTests.Player;
 
 [TestFixture]
-internal class SiteEditModelTests
+internal class PlayerEditModelTests
 {
     [Test]
     public async Task OnGetAsync_IdNull_ReturnNotFound()
@@ -28,7 +28,7 @@ internal class SiteEditModelTests
     }
 
     [Test]
-    public async Task OnGetAsync_SiteNull_ReturnNotFound()
+    public async Task OnGetAsync_PlayerNull_ReturnNotFound()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
@@ -43,12 +43,13 @@ internal class SiteEditModelTests
     }
 
     [Test]
-    public async Task OnGetAsync_IdNotFound_ReturnNotFound()
+    public async Task OnGetAsync_PlayerIdNotFound_ReturnNotFound()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new EditModel(context);
-        Helpers.SeedNumSites(context, 1);
+        Helpers.SeedAllMembershipTypes(context);
+        Helpers.SeedNumPlayers(context, 1);
         var expectedResult = new NotFoundResult();
 
         // act
@@ -59,16 +60,17 @@ internal class SiteEditModelTests
     }
 
     [Test]
-    public async Task OnGetAsync_IdFound_ReturnPage()
+    public async Task OnGetAsync_PlayerIdFound_ReturnPage()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new EditModel(context);
-        Helpers.SeedNumSites(context, 3);
+        Helpers.SeedAllMembershipTypes(context);
+        Helpers.SeedNumPlayers(context, 1);
         var expectedResult = new PageResult();
 
         // act
-        var actualResult = await page.OnGetAsync(3);
+        var actualResult = await page.OnGetAsync(1);
 
         // assert
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
@@ -81,7 +83,7 @@ internal class SiteEditModelTests
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = Helpers.PageFromDummyHttpContext<EditModel>(context);
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-        page.Site = new Models.Site();
+        page.Player = new Models.Player();
         page.ModelState.AddModelError("Error.Text", "Some error text.");
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         var expectedResult = new PageResult();
@@ -91,8 +93,7 @@ internal class SiteEditModelTests
 
         // assert
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
-        Assert.That(page.ConfirmationModeOptions, Is.Not.Null);
-        Assert.That(page.MenuPositionOptions, Is.Not.Null);
+        Assert.That(page.MembershipTypeSL, Is.Not.Null);
     }
 
     [Test]
@@ -101,10 +102,11 @@ internal class SiteEditModelTests
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = Helpers.PageFromDummyHttpContext<EditModel>(context);
-        Helpers.SeedNumSites(context, 1);
+        Helpers.SeedAllMembershipTypes(context);
+        Helpers.SeedNumPlayers(context, 1);
 #pragma warning disable CS8604 // Possible null reference argument.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-        page.Site = context.Sites.First();
+        page.Player = context.Players.First();
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 #pragma warning restore CS8604 // Possible null reference argument.
         var expectedResult = new RedirectToPageResult("./Index");
@@ -114,6 +116,6 @@ internal class SiteEditModelTests
 
         // assert
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
-        Assert.That(page.Site.Id, Is.EqualTo(1));
+        Assert.That(page.Player.Id, Is.EqualTo(1));
     }
 }

@@ -4,18 +4,12 @@ using System.Threading.Tasks;
 using HobbyTeamManager.Data;
 using HobbyTeamManager.Pages.Sites;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Moq;
 using HobbyTeamManager.UnitTests.Utilities;
 
 namespace HobbyTeamManager.UnitTests.UnitTests;
 
 [TestFixture]
-public class SiteHomeModelTests
+internal class SiteHomeModelTests
 {
     [Test]
     public async Task OnGetAsync_ParameterIdEqualsNull_ReturnsNotFound()

@@ -7,7 +7,7 @@ using HobbyTeamManager.UnitTests.Utilities;
 namespace HobbyTeamManager.UnitTests.UnitTests;
 
 [TestFixture]
-public class SiteIndexModelTests
+internal class SiteIndexModelTests
 {
     [Test]
     [TestCase(1)]

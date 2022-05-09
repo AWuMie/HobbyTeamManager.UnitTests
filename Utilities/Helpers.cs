@@ -69,14 +69,6 @@ public static class Helpers
         return page;
     }
 
-    public static void SeedSite(HobbyTeamManagerContext context)
-    {
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-        context.Sites.Add(new Site());
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-        context.SaveChanges();
-    }
-
     public static void SeedNumSites(HobbyTeamManagerContext context, int num)
     {
         var sites = new List<Site>();
@@ -98,21 +90,6 @@ public static class Helpers
         context.SaveChanges();
     }
 
-    public static void SeedSeason(HobbyTeamManagerContext context)
-    {
-        var season = new Season()
-        {
-            Year = 2020,
-            StartMonth = 8,
-            MatchOnDay = 0,
-            SiteId = 1,
-        };
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-            context.Seasons.Add(season);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-        context.SaveChanges();
-    }
-
     public static void SeedNumSeasons(HobbyTeamManagerContext context, int num)
     {
         var seasons = new List<Season>();
@@ -130,6 +107,52 @@ public static class Helpers
         }
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
         context.Seasons.AddRange(seasons);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        context.SaveChanges();
+    }
+
+    public static void SeedAllMembershipTypes(HobbyTeamManagerContext context)
+    {
+        var mstMember = new MembershipType()
+        {
+            Name = MembershipType.Member,
+        };
+        var mstGuest = new MembershipType()
+        {
+            Name = MembershipType.Guest,
+        };
+        var mstEx = new MembershipType()
+        {
+            Name = MembershipType.Ex,
+        };
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+        context.MembershipTypes.Add(mstMember);
+        context.MembershipTypes.Add(mstGuest);
+        context.MembershipTypes.Add(mstEx);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+        context.SaveChanges();
+    }
+
+    public static void SeedNumPlayers(HobbyTeamManagerContext context, int num)
+    {
+        var players = new List<Player>();
+
+        for (int i = 0; i < num; i++)
+        {
+            string firstName = "FirstName" + (i + 1).ToString();
+            string lastName = "LastName" + (i + 1).ToString();
+
+            var player = new Player()
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Emailaddress = $"{firstName}@{lastName}.com",
+                MembershipTypeId = 1,
+            };
+            players.Add(player);
+        }
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+        context.Players.AddRange(players);
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
         context.SaveChanges();
     }

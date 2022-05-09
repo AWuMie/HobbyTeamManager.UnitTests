@@ -46,8 +46,8 @@ internal class SeasonDetailsModelTests
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
-        Helpers.SeedSite(context);
-        Helpers.SeedSeason(context);
+        Helpers.SeedNumSites(context, 1);
+        Helpers.SeedNumSeasons(context, 1);
         var page = new DetailsModel(context);
         var expectedResult = new PageResult();
         int id = 1;

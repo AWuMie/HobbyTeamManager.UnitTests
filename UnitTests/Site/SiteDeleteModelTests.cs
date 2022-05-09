@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace HobbyTeamManager.UnitTests.UnitTests;
 
 [TestFixture]
-public class SiteDeleteModelTests
+internal class SiteDeleteModelTests
 {
     [Test]
     public async Task OnGetAsync_IdNull_ReturnNotFound()
@@ -49,7 +49,7 @@ public class SiteDeleteModelTests
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new DeleteModel(context);
-        Helpers.SeedSite(context);
+        Helpers.SeedNumSites(context, 1);
         var expectedResult = new NotFoundResult();
 
         // act

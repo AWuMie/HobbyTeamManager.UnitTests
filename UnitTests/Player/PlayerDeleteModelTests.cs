@@ -1,17 +1,20 @@
 ﻿using HobbyTeamManager.Data;
-using HobbyTeamManager.Pages.Seasons;
+using HobbyTeamManager.Pages.Players;
 using HobbyTeamManager.UnitTests.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace HobbyTeamManager.UnitTests.UnitTests;
+namespace HobbyTeamManager.UnitTests.UnitTests.Player;
 
 [TestFixture]
-internal class SeasonDeleteModelTests
+internal class PlayerDeleteModelTests
 {
     [Test]
     public async Task OnGetAsync_IdNull_ReturnNotFound()
@@ -29,7 +32,7 @@ internal class SeasonDeleteModelTests
     }
 
     [Test]
-    public async Task OnGetAsync_SeasonNull_ReturnNotFound()
+    public async Task OnGetAsync_PlayerNull_ReturnNotFound()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
@@ -49,8 +52,8 @@ internal class SeasonDeleteModelTests
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new DeleteModel(context);
-        Helpers.SeedNumSites(context, 1);
-        Helpers.SeedNumSeasons(context, 1);
+        Helpers.SeedAllMembershipTypes(context);
+        Helpers.SeedNumPlayers(context, 1);
         var expectedResult = new NotFoundResult();
 
         // act
@@ -66,12 +69,12 @@ internal class SeasonDeleteModelTests
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new DeleteModel(context);
-        Helpers.SeedNumSites(context, 1);
-        Helpers.SeedNumSeasons(context, 3);
+        Helpers.SeedAllMembershipTypes(context);
+        Helpers.SeedNumPlayers(context, 1);
         var expectedResult = new PageResult();
 
         // act
-        var actualResult = await page.OnGetAsync(3);
+        var actualResult = await page.OnGetAsync(1);
 
         // assert
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
@@ -93,58 +96,58 @@ internal class SeasonDeleteModelTests
     }
 
     [Test]
-    public async Task OnPostAsync_SeasonNotFound_NoSeasonDeletedReDirectToIndexPage()
+    public async Task OnPostAsync_PlayerNotFound_NoPlayerDeletedReDirectToIndexPage()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new DeleteModel(context);
-        Helpers.SeedNumSites(context, 1);
-        int numSeasons = 3;
-        Helpers.SeedNumSeasons(context, numSeasons);
+        Helpers.SeedAllMembershipTypes(context);
+        int numPlayers = 3;
+        Helpers.SeedNumPlayers(context, numPlayers);
         var expectedResult = new RedirectToPageResult("./Index");
         int id = 5;
 #pragma warning disable CS8604 // Possible null reference argument.
-        var expectedSeasons = context.Seasons.Where(s => s.Id != id).ToList(); // should be all ;-)
+        var expectedPlayers = context.Players.Where(p => p.Id != id).ToList(); // should be all ;-)
 #pragma warning restore CS8604 // Possible null reference argument.
 
         // act
         var actualResult = await page.OnPostAsync(id);
 
         // assert
-        var actualSeasons = context.Seasons.AsNoTracking().ToList();
+        var actualPlayers = context.Players.AsNoTracking().ToList();
 
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
-        Assert.That(actualSeasons.Count, Is.EqualTo(numSeasons));
-        Assert.That(actualSeasons.Count, Is.EqualTo(expectedSeasons.Count));
-        Assert.That(actualSeasons.OrderBy(s => s.Id).Select(s => s.Year),
-            Is.EqualTo(expectedSeasons.OrderBy(s => s.Id).Select(s => s.Year)));
+        Assert.That(actualPlayers.Count, Is.EqualTo(numPlayers));
+        Assert.That(actualPlayers.Count, Is.EqualTo(expectedPlayers.Count));
+        Assert.That(actualPlayers.OrderBy(p => p.Id).Select(p => p.FirstName),
+            Is.EqualTo(expectedPlayers.OrderBy(p => p.Id).Select(p => p.FirstName)));
     }
 
     [Test]
-    public async Task OnPostAsync_SeasonFound_ReDirectToIndexPage()
+    public async Task OnPostAsync_PlayerFound_ReDirectToIndexPage()
     {
         // arrange
         using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new DeleteModel(context);
-        Helpers.SeedNumSites(context, 1);
-        int numSeasons = 3;
-        Helpers.SeedNumSeasons(context, numSeasons);
+        Helpers.SeedAllMembershipTypes(context);
+        int numPlayers = 3;
+        Helpers.SeedNumPlayers(context, numPlayers);
         var expectedResult = new RedirectToPageResult("./Index");
         int id = 2;
 #pragma warning disable CS8604 // Possible null reference argument.
-        var expectedSeasons = context.Seasons.Where(s => s.Id != id).ToList();  // should one less here
+        var expectedPlayers = context.Players.Where(p => p.Id != id).ToList();  // should one less here
 #pragma warning restore CS8604 // Possible null reference argument.
 
         // act
         var actualResult = await page.OnPostAsync(id);
 
         // assert
-        var actualSeasons = context.Seasons.AsNoTracking().ToList();
+        var actualPlayers = context.Players.AsNoTracking().ToList();
 
         Assert.That(actualResult, Is.TypeOf(expectedResult.GetType()));
-        Assert.That(actualSeasons.Count, Is.EqualTo(numSeasons - 1));
-        Assert.That(actualSeasons.Count, Is.EqualTo(expectedSeasons.Count));
-        Assert.That(actualSeasons.OrderBy(s => s.Id).Select(s => s.Year),
-            Is.EqualTo(expectedSeasons.OrderBy(s => s.Id).Select(s => s.Year)));
+        Assert.That(actualPlayers.Count, Is.EqualTo(numPlayers - 1));
+        Assert.That(actualPlayers.Count, Is.EqualTo(expectedPlayers.Count));
+        Assert.That(actualPlayers.OrderBy(p => p.Id).Select(p => p.FirstName),
+            Is.EqualTo(expectedPlayers.OrderBy(p => p.Id).Select(p => p.FirstName)));
     }
 }

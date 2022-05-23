@@ -4,10 +4,6 @@ using HobbyTeamManager.UnitTests.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace HobbyTeamManager.UnitTests.UnitTests.Player;
@@ -19,7 +15,7 @@ internal class PlayerCreateModelTests
     public void OnGet_WhenCalled_InitializesDropdownListsAndReturnsPage()
     {
         // arrange
-        using var context = new HobbyTeamManagerContext(Utilities.Helpers.TestDbContextOptions());
+        using var context = new HobbyTeamManagerContext(Helpers.TestDbContextOptions());
         var page = new CreateModel(context);
         var expectedResult = new PageResult();
 
